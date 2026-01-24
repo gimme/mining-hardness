@@ -1,0 +1,37 @@
+name: Build
+
+on: [workflow_call, push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Gradle build
+        run: ./gradlew build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: build-artifact
+          path: |
+            neoforge/build/libs/*.jar
+          if-no-files-found: error

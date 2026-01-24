@@ -1,0 +1,105 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      mod_id: ${{ steps.properties.outputs.mod_id }}
+      minecraft_version_range: ${{ steps.properties.outputs.minecraft_version_range }}
+      full_version: ${{ steps.vars.outputs.full_version }}
+      changelog: ${{ steps.changelog.outputs.release_notes }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Read Gradle properties
+        id: properties
+        uses: christian-draeger/read-properties@1.1.1
+        with:
+          path: './gradle.properties'
+          properties: 'mod_id version minecraft_version minecraft_version_range'
+
+      - name: Set up version variables
+        id: vars
+        run: |
+          full_version="${{ steps.properties.outputs.minecraft_version }}-${{ steps.properties.outputs.version }}"
+
+          echo "full_version=${full_version}" >> $GITHUB_OUTPUT
+          echo "tag=v${full_version}" >> $GITHUB_OUTPUT
+
+      - name: Verify changelog entry exists
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+            const tag = '${{ steps.vars.outputs.tag }}';
+            const versionHeader = `## [${tag}]`;
+            if (!changelog.includes(versionHeader)) {
+              throw new Error(`Changelog does not contain an entry for version ${tag}. Please add a corresponding section to CHANGELOG.md.`);
+            }
+
+      - name: Read changelog
+        id: changelog
+        uses: ffurrer2/extract-release-notes@v3
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: build-artifact
+          path: ./build-artifact
+
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create ${{ steps.vars.outputs.tag }} ./build-artifact/*.jar --notes '${{ steps.changelog.outputs.release_notes }}'
+    needs:
+      - build
+
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        # List of loaders to publish for
+        loader: [neoforge]
+      fail-fast: false
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: build-artifact
+          path: ./build-artifact
+
+      - name: Publish to platforms
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          # CurseForge
+          curseforge-id: <TODO>
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          # Modrinth
+          modrinth-id: <TODO>
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          # General
+          files: ./build-artifact/*-${{ matrix.loader }}-${{ needs.release.outputs.full_version }}.jar
+          name: '${{ needs.release.outputs.mod_id }}-${{ matrix.loader }}-${{ needs.release.outputs.full_version }}'
+          version: '${{ needs.release.outputs.full_version }}'
+          changelog: ${{ needs.release.outputs.changelog }}
+          loaders: ${{ matrix.loader }}
+          game-versions: ${{ needs.release.outputs.minecraft_version_range }}
+    needs:
+      - build
+      - release
