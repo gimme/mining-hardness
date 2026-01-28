@@ -23,7 +23,9 @@ public class ItemDurabilityMixin {
      */
     @Redirect(method = "mineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;)V"))
     private void onMineBlockHurtAndBreak(ItemStack instance, int damageAmount, LivingEntity miningEntity, EquipmentSlot equipmentSlot, ItemStack itemStack, Level level, BlockState blockState, BlockPos blockPos) {
-        int adjustedAmount = CommonConfig.INSTANCE.getAdjustedToolDamage(damageAmount, blockPos.getY());
-        instance.hurtAndBreak(adjustedAmount, miningEntity, equipmentSlot);
+        if (CommonConfig.INSTANCE.shouldBlockBeAdjusted(blockPos, level)) {
+            damageAmount = CommonConfig.INSTANCE.getAdjustedToolDamage(damageAmount, blockPos.getY());
+        }
+        instance.hurtAndBreak(damageAmount, miningEntity, equipmentSlot);
     }
 }

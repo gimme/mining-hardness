@@ -1,6 +1,11 @@
 package dev.gimme.mininghardness;
 
+import com.electronwill.nightconfig.core.Config;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class NeoForgeCommonConfig extends CommonConfig {
 
@@ -51,6 +56,30 @@ public class NeoForgeCommonConfig extends CommonConfig {
             .comment("If hardness adjustments should only apply in the Overworld dimension.")
             .define("hardnessInOverworldOnly", true);
 
+    private static final ModConfigSpec.ConfigValue<String> BLOCK_WHITELIST = BUILDER
+            .comment("""
+                    Regex pattern of block IDs to apply the hardness adjustments to. If empty, all blocks are affected.
+                    Example: "stone|deepslate|andesite|calcite|diorite|granite|tuff" to match the common cave blocks.""")
+            .define("blockWhitelist", "", NeoForgeCommonConfig::isValidRegex);
+
+    private static final ModConfigSpec.ConfigValue<String> BLOCK_BLACKLIST = BUILDER
+            .comment("""
+                    Regex pattern of block IDs to exclude from the hardness adjustments.
+                    Example: ".*_ore" to exclude all ore blocks.""")
+            .define("blockBlacklist", "", NeoForgeCommonConfig::isValidRegex);
+
+    /**
+     * Checks if the given string is a valid regex pattern.
+     */
+    private static boolean isValidRegex(@NotNull Object regex) {
+        try {
+            Pattern.compile(regex.toString());
+        } catch (PatternSyntaxException ex) {
+            return false;
+        }
+        return true;
+    }
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     @Override
@@ -96,5 +125,15 @@ public class NeoForgeCommonConfig extends CommonConfig {
     @Override
     public boolean isHardnessInOverworldOnly() {
         return HARDNESS_IN_OVERWORLD_ONLY.get();
+    }
+
+    @Override
+    public String getBlockHardnessWhitelist() {
+        return BLOCK_WHITELIST.get();
+    }
+
+    @Override
+    public String getBlockHardnessBlacklist() {
+        return BLOCK_BLACKLIST.get();
     }
 }
