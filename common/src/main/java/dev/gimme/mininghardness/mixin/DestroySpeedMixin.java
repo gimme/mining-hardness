@@ -1,6 +1,6 @@
 package dev.gimme.mininghardness.mixin;
 
-import dev.gimme.mininghardness.CommonConfig;
+import dev.gimme.mininghardness.Main;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -11,21 +11,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Mixin to adjust block hardness.
+ * Adjusts block destroy speed based on Y level.
  */
 @Mixin(BlockStateBase.class)
-public class BlockHardnessMixin {
+public class DestroySpeedMixin {
 
-    /**
-     * Adjusts block hardness based on Y level and config settings.
-     */
     @Inject(at = @At("RETURN"), method = "getDestroySpeed", cancellable = true)
     private void onGetDestroySpeed(BlockGetter level, BlockPos blockPos, CallbackInfoReturnable<Float> cir) {
         if (!(level instanceof Level realLevel)) return;
 
-        if (CommonConfig.INSTANCE.shouldBlockBeAdjusted(blockPos, realLevel)) {
+        var config = Main.INSTANCE.getCommonConfig();
+        if (config.shouldBlockBeAdjusted(blockPos, realLevel)) {
             float originalHardness = cir.getReturnValue();
-            float adjustedHardness = CommonConfig.INSTANCE.getAdjustedHardness(originalHardness, blockPos.getY());
+            float adjustedHardness = config.getAdjustedHardness(originalHardness, blockPos.getY());
             cir.setReturnValue(adjustedHardness);
         }
     }

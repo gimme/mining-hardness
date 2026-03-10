@@ -1,6 +1,6 @@
 package dev.gimme.mininghardness.mixin;
 
-import dev.gimme.mininghardness.CommonConfig;
+import dev.gimme.mininghardness.Main;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,18 +13,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Mixin to adjust item durability loss when mining blocks.
+ * Adjusts tool damage when mining blocks based on depth.
  */
 @Mixin(Item.class)
-public class ItemDurabilityMixin {
+public class ToolDamageMixin {
 
-    /**
-     * Adjusts item durability loss when mining blocks based on adjusted block hardness and config settings.
-     */
     @Redirect(method = "mineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;)V"))
     private void onMineBlockHurtAndBreak(ItemStack instance, int damageAmount, LivingEntity miningEntity, EquipmentSlot equipmentSlot, ItemStack itemStack, Level level, BlockState blockState, BlockPos blockPos) {
-        if (CommonConfig.INSTANCE.shouldBlockBeAdjusted(blockPos, level)) {
-            damageAmount = CommonConfig.INSTANCE.getAdjustedToolDamage(damageAmount, blockPos.getY());
+        var config = Main.INSTANCE.getCommonConfig();
+        if (config.shouldBlockBeAdjusted(blockPos, level)) {
+            damageAmount = config.getAdjustedToolDamage(damageAmount, blockPos.getY());
         }
         instance.hurtAndBreak(damageAmount, miningEntity, equipmentSlot);
     }
