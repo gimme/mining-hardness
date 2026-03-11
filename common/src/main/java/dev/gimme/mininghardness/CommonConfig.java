@@ -29,8 +29,7 @@ public class CommonConfig {
     private static final ConfigValue<Number> DEPTH_MULTIPLIER_BONUS = SPEC.variable()
             .comment("""
                 Extra multiplier applied purely from depth, independent of enclosure.
-                At 0.0 depth alone has no effect; at 1.0 depth alone can double hardness at max depth.
-                Default 0.0 means depth alone has no effect.""")
+                At 0.0 depth alone has no effect; at 1.0 depth alone can double hardness at max depth.""")
             .define("depth.multiplierBonus", 0.0);
 
     // --- enclosure ---
@@ -41,15 +40,14 @@ public class CommonConfig {
                 Enclosure is measured by scanning a 5x5x5 area around the block, weighting nearby solid blocks more heavily.
                 The raw enclosure value (0.0-1.0) is raised to this power before applying the multiplier bonus.
                 Higher values make low enclosure nearly irrelevant while high enclosure ramps up steeply.
-                Example with exponent 5: 30% enclosure -> 0.2% effect, 50% -> 3.1%, 70% -> 16.8%, 90% -> 59.0%.
-                Default 5.0.""")
+                Example with exponent 5: 30% enclosure -> 0.2% effect, 50% -> 3.1%, 70% -> 16.8%, 90% -> 59.0%.""")
             .define("enclosure.exponent", 5.0);
 
     private static final ConfigValue<Number> ENCLOSURE_MULTIPLIER_BONUS = SPEC.variable()
             .comment("""
                 Maximum hardness multiplier bonus when fully enclosed at max depth.
                 The actual multiplier scales between 1x and (1 + this value)x based on enclosure and depth.
-                Default 15.0 means fully enclosed blocks at max depth get a 16x enclosure multiplier.""")
+                E.g. 15.0 means fully enclosed blocks at max depth get a 16x multiplier.""")
             .define("enclosure.multiplierBonus", 15.0);
 
     // --- nether ---
@@ -101,7 +99,7 @@ public class CommonConfig {
             .comment("""
                 Regex pattern of block IDs to exclude from the hardness adjustments.
                 Blacklisted blocks are also not counted as solid in the enclosure scan, so they don't make neighboring blocks harder.
-                Empty by default (no blocks excluded).""")
+                Example: ".*_ore" to exclude all ores.""")
             .define("scope.blockBlacklist", "");
 
     private static final ConfigValue<Number> EXEMPT_MULTIPLIER = SPEC.variable()
@@ -172,7 +170,7 @@ public class CommonConfig {
     /**
      * Calculates the enclosure level (0.0–1.0) for the given position by scanning a 5x5x5 area.
      * Each solid block contributes weight inversely proportional to its squared distance from the center.
-     * Blacklisted blocks (e.g. ores) are not counted as solid.
+     * Blacklisted blocks are not counted as solid.
      */
     public float calculateEnclosure(@NotNull Level level, @NotNull BlockPos pos) {
         boolean hasBlacklist = !cachedBlacklist.isEmpty();
