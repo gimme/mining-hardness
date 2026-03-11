@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.21.11-0.2.0] - 2026-03-11
+
 ### Added
 
 - Enclosure-based hardness scaling (5x5x5 area scan with distance weighting)
