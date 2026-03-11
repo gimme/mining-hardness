@@ -11,17 +11,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Adjusts food exhaustion caused by mining blocks based on depth.
+ * Adjusts food exhaustion caused by mining blocks based on depth and neighbor enclosure.
  */
 @Mixin(Block.class)
 public class MiningExhaustionMixin {
 
     @Redirect(method = "playerDestroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
     private void onPlayerDestroyCauseFoodExhaustion(Player instance, float exhaustionAmount, Level level, Player player, BlockPos blockPos, BlockState blockState) {
-        var config = Main.INSTANCE.getCommonConfig();
-        if (config.shouldBlockBeAdjusted(blockPos, level)) {
-            exhaustionAmount = config.getAdjustedExhaustion(exhaustionAmount, blockPos.getY());
-        }
-        instance.causeFoodExhaustion(exhaustionAmount);
+        instance.causeFoodExhaustion(Main.INSTANCE.getCommonConfig().getAdjustedExhaustion(exhaustionAmount, blockPos, level));
     }
 }

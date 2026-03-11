@@ -13,17 +13,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Adjusts tool damage when mining blocks based on depth.
+ * Adjusts tool damage when mining blocks based on depth and neighbor enclosure.
  */
 @Mixin(Item.class)
 public class ToolDamageMixin {
 
     @Redirect(method = "mineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;)V"))
     private void onMineBlockHurtAndBreak(ItemStack instance, int damageAmount, LivingEntity miningEntity, EquipmentSlot equipmentSlot, ItemStack itemStack, Level level, BlockState blockState, BlockPos blockPos) {
-        var config = Main.INSTANCE.getCommonConfig();
-        if (config.shouldBlockBeAdjusted(blockPos, level)) {
-            damageAmount = config.getAdjustedToolDamage(damageAmount, blockPos.getY());
-        }
-        instance.hurtAndBreak(damageAmount, miningEntity, equipmentSlot);
+        instance.hurtAndBreak(Main.INSTANCE.getCommonConfig().getAdjustedToolDamage(damageAmount, blockPos, level), miningEntity, equipmentSlot);
     }
 }

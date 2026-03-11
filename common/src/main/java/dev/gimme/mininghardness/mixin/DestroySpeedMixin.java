@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Adjusts block destroy speed based on Y level.
+ * Adjusts block destroy speed based on depth and neighbor enclosure.
  */
 @Mixin(BlockStateBase.class)
 public class DestroySpeedMixin {
@@ -19,12 +19,6 @@ public class DestroySpeedMixin {
     @Inject(at = @At("RETURN"), method = "getDestroySpeed", cancellable = true)
     private void onGetDestroySpeed(BlockGetter level, BlockPos blockPos, CallbackInfoReturnable<Float> cir) {
         if (!(level instanceof Level realLevel)) return;
-
-        var config = Main.INSTANCE.getCommonConfig();
-        if (config.shouldBlockBeAdjusted(blockPos, realLevel)) {
-            float originalHardness = cir.getReturnValue();
-            float adjustedHardness = config.getAdjustedHardness(originalHardness, blockPos.getY());
-            cir.setReturnValue(adjustedHardness);
-        }
+        cir.setReturnValue(Main.INSTANCE.getCommonConfig().getAdjustedHardness(cir.getReturnValue(), blockPos, realLevel));
     }
 }
