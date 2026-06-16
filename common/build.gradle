@@ -18,7 +18,9 @@ dependencies {
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.3'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.3'
 
-    implementation("com.electronwill.night-config:toml:${nightconfig_version}")
+    // Forge Config API Port – NeoForge's config API (ModConfigSpec, ModConfig) ported for the common module.
+    // compileOnly: the actual implementation is provided by NeoForge natively and by FCAP on Fabric at runtime.
+    compileOnly("fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:${forge_config_api_port_version}")
 }
 
 configurations {

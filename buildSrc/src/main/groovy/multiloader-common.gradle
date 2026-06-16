@@ -36,6 +36,10 @@ repositories {
         )
         filter { includeGroup('org.parchmentmc.data') }
     }
+    maven {
+        name = "Fuzs Mod Resources"
+        url = 'https://raw.githubusercontent.com/Fuzss/modresources/main/maven/'
+    }
 }
 
 // Declare capabilities on the outgoing configurations.
@@ -86,7 +90,8 @@ processResources {
             'neoforge_version'             : neoforge_version,
             'neoforge_loader_version_range': neoforge_loader_version_range,
             'credits'                      : credits,
-            'java_version'                 : java_version
+            'java_version'                 : java_version,
+            'forge_config_api_port_version': forge_config_api_port_version
     ]
 
     var jsonExpandProps = expandProps.collectEntries {
@@ -97,7 +102,7 @@ processResources {
         expand expandProps
     }
 
-    filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
+    filesMatching(['fabric.mod.json', '*.mixins.json']) {
         expand jsonExpandProps
     }
 

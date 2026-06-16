@@ -1,20 +1,17 @@
 package dev.gimme.mininghardness;
 
-import java.nio.file.Path;
-
 public class Main {
 
     public static Main INSTANCE;
 
-    public static Main init(Path configDir) {
-        INSTANCE = new Main(configDir);
+    public static Main init() {
+        INSTANCE = new Main();
         return INSTANCE;
     }
 
     private final CommonConfig commonConfig;
 
-    private Main(Path configDir) {
-        CommonConfig.SPEC.init(configDir, Constants.MOD_ID + "-common.toml");
+    private Main() {
         this.commonConfig = new CommonConfig();
     }
 

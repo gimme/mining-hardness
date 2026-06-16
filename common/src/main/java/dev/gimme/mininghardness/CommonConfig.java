@@ -1,32 +1,34 @@
 package dev.gimme.mininghardness;
 
-import dev.gimme.config.ModConfigSpec;
-import dev.gimme.config.ModConfigSpec.ConfigValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
 public class CommonConfig {
 
-    public static final ModConfigSpec SPEC = new ModConfigSpec();
+    public static final String FILE_NAME = Constants.MOD_ID + "-common.toml";
+
+    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     // --- depth ---
 
-    private static final ConfigValue<Number> DEPTH_START_Y = SPEC.variable()
+    private static final ConfigValue<Long> DEPTH_START_Y = BUILDER
             .comment("Y level at which depth-based difficulty begins increasing.")
-            .define("depth.startY", 62);
+            .define("depth.startY", 62L);
 
-    private static final ConfigValue<Number> DEPTH_END_Y = SPEC.variable()
+    private static final ConfigValue<Long> DEPTH_END_Y = BUILDER
             .comment("Y level at which depth factor reaches 1.0 (maximum).")
-            .define("depth.endY", -64);
+            .define("depth.endY", -64L);
 
-    private static final ConfigValue<Number> DEPTH_MULTIPLIER_BONUS = SPEC.variable()
+    private static final ConfigValue<Double> DEPTH_MULTIPLIER_BONUS = BUILDER
             .comment("""
                 Extra multiplier applied purely from depth, independent of enclosure.
                 At 0.0 depth alone has no effect; at 1.0 depth alone can double hardness at max depth.""")
@@ -34,7 +36,7 @@ public class CommonConfig {
 
     // --- enclosure ---
 
-    private static final ConfigValue<Number> ENCLOSURE_EXPONENT = SPEC.variable()
+    private static final ConfigValue<Double> ENCLOSURE_EXPONENT = BUILDER
             .comment("""
                 Controls how steeply enclosure scales from 0 to 1.
                 Enclosure is measured by scanning a 5x5x5 area around the block, weighting nearby solid blocks more heavily.
@@ -43,7 +45,7 @@ public class CommonConfig {
                 Example with exponent 5: 30% enclosure -> 0.2% effect, 50% -> 3.1%, 70% -> 16.8%, 90% -> 59.0%.""")
             .define("enclosure.exponent", 5.0);
 
-    private static final ConfigValue<Number> ENCLOSURE_MULTIPLIER_BONUS = SPEC.variable()
+    private static final ConfigValue<Double> ENCLOSURE_MULTIPLIER_BONUS = BUILDER
             .comment("""
                 Maximum hardness multiplier bonus when fully enclosed at max depth.
                 The actual multiplier scales between 1x and (1 + this value)x based on enclosure and depth.
@@ -52,21 +54,21 @@ public class CommonConfig {
 
     // --- nether ---
 
-    private static final ConfigValue<Number> NETHER_START_Y = SPEC.variable()
+    private static final ConfigValue<Long> NETHER_START_Y = BUILDER
             .comment("Start Y for the Nether dimension. Set startY == endY to always use max depth factor.")
-            .define("nether.startY", 128);
+            .define("nether.startY", 128L);
 
-    private static final ConfigValue<Number> NETHER_END_Y = SPEC.variable()
+    private static final ConfigValue<Long> NETHER_END_Y = BUILDER
             .comment("End Y for the Nether dimension.")
-            .define("nether.endY", 128);
+            .define("nether.endY", 128L);
 
     // --- hardness soft cap ---
 
-    private static final ConfigValue<Number> HARDNESS_SOFT_CAP = SPEC.variable()
+    private static final ConfigValue<Long> HARDNESS_SOFT_CAP = BUILDER
             .comment("Hardness value above which the soft cap multiplier is applied. Obsidian has a hardness of 50.")
-            .define("softCap.threshold", 50);
+            .define("softCap.threshold", 50L);
 
-    private static final ConfigValue<Number> HARDNESS_SOFT_CAP_MULTIPLIER = SPEC.variable()
+    private static final ConfigValue<Double> HARDNESS_SOFT_CAP_MULTIPLIER = BUILDER
             .comment("""
                 Multiplier applied to hardness values above the soft cap.
                 For example, a value of 0.2 means that an excess hardness of 10 above the soft cap will only put the final hardness
@@ -75,7 +77,7 @@ public class CommonConfig {
 
     // --- effects ---
 
-    private static final ConfigValue<Number> TOOL_DAMAGE_HARDNESS_MULTIPLIER = SPEC.variable()
+    private static final ConfigValue<Double> TOOL_DAMAGE_HARDNESS_MULTIPLIER = BUILDER
             .comment("""
                 How much tool damage is affected by the adjusted block hardness. For example, if set to 1.0, tool damage scales
                 linearly with the increase in hardness. Keep in mind that tools only take damage in whole numbers (default 1 per block),
@@ -83,32 +85,34 @@ public class CommonConfig {
                 Vanilla: 0.0""")
             .define("effects.toolDamageMultiplier", 1.0);
 
-    private static final ConfigValue<Number> EXHAUSTION_HARDNESS_MULTIPLIER = SPEC.variable()
+    private static final ConfigValue<Double> EXHAUSTION_HARDNESS_MULTIPLIER = BUILDER
             .comment("How much exhaustion is affected by the adjusted block hardness.")
             .define("effects.exhaustionMultiplier", 2.0);
 
     // --- scope ---
 
-    private static final ConfigValue<String> BLOCK_WHITELIST = SPEC.variable()
+    private static final ConfigValue<String> BLOCK_WHITELIST = BUILDER
             .comment("""
                 Regex pattern of block IDs to apply the hardness adjustments to. If empty, all blocks are affected.
                 Example: "stone|deepslate|andesite|calcite|diorite|granite|tuff" to match the common cave blocks.""")
             .define("scope.blockWhitelist", "");
 
-    private static final ConfigValue<String> BLOCK_BLACKLIST = SPEC.variable()
+    private static final ConfigValue<String> BLOCK_BLACKLIST = BUILDER
             .comment("""
                 Regex pattern of block IDs to exclude from the hardness adjustments.
                 Blacklisted blocks are also not counted as solid in the enclosure scan, so they don't make neighboring blocks harder.
                 Example: ".*_ore" to exclude all ores.""")
             .define("scope.blockBlacklist", "");
 
-    private static final ConfigValue<Number> EXEMPT_MULTIPLIER = SPEC.variable()
+    private static final ConfigValue<Double> EXEMPT_MULTIPLIER = BUILDER
             .comment("""
                 How much of the hardness effect is applied to blocks exempted by the white-/blacklist.
                 0.0 means exempted blocks are completely unaffected (default).
                 1.0 means the lists have no effect (all blocks fully affected).
                 0.5 means exempted blocks get half the hardness increase.""")
             .define("scope.exemptMultiplier", 0.0);
+
+    public static final ModConfigSpec SPEC = BUILDER.build();
 
     // --- pre-computed constants and cached state ---
 

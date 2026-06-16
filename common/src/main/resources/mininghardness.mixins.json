@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "dev.gimme.mininghardness.mixin",
   "refmap": "${mod_id}.refmap.json",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_${java_version}",
   "mixins": [
     "DestroySpeedMixin",
     "ToolDamageMixin",

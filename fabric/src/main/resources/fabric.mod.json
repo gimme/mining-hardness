@@ -7,9 +7,12 @@
     "authors": [
         "${mod_author}"
     ],
-    "contact": {},
+    "contact": {
+        "homepage": "https://modrinth.com/mod/mining-hardness",
+        "issues": "https://github.com/gimme/mining-hardness/issues",
+        "sources": "https://github.com/gimme/mining-hardness"
+    },
     "license": "${license}",
-    "icon": "${mod_id}.png",
     "environment": "*",
     "entrypoints": {
         "main": [
@@ -23,6 +26,14 @@
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
         "minecraft": "~${minecraft_version}",
-        "java": ">=${java_version}"
+        "java": ">=${java_version}",
+        "forgeconfigapiport": ">=${forge_config_api_port_version}"
+    },
+    "custom": {
+        "mc-publish": {
+            "dependencies": [
+                "forgeconfigapiport(required){modrinth:forge-config-api-port}{curseforge:forge-config-api-port}"
+            ]
+        }
     }
 }
