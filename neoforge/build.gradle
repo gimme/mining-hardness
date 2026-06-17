@@ -6,11 +6,6 @@ plugins {
 neoForge {
     version = neoforge_version
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
-
     runs {
         configureEach {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
@@ -22,7 +17,7 @@ neoForge {
             client()
         }
         data {
-            client()
+            serverData()
 
             // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
