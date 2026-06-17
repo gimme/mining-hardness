@@ -3,14 +3,17 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
+def projectPath = project.path
+def mixinDebugJvmArgs = project.mixinDebugJvmArgs
+
 neoForge {
     version = neoforge_version
 
     runs {
         configureEach {
-            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
-            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
-            jvmArguments.addAll project.mixinDebugJvmArgs
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id as String)
+            ideName = "NeoForge ${it.name.capitalize()} (${projectPath})" // Unify the run config names with fabric
+            jvmArguments.addAll mixinDebugJvmArgs
         }
         client {
             client()
