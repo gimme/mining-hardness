@@ -18,6 +18,10 @@ loom {
         accessWidenerPath.set(aw)
     }
     runs {
+        configureEach {
+            // Mixin diagnostics parity with NeoForge (see project.mixinDebugJvmArgs in multiloader-loader.gradle).
+            vmArgs(project.mixinDebugJvmArgs)
+        }
         client {
             client()
             setConfigName('Fabric Client')

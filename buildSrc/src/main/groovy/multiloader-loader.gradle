@@ -2,6 +2,20 @@ plugins {
     id 'multiloader-common'
 }
 
+// Mixin diagnostics shared by both loaders' dev runs (single source of truth).
+//   export          -> dump transformed classes to <module>/.mixin.out/
+//   verbose         -> log a "Mixing <mixin> into <target>" line per applied mixin
+//   countInjections -> warn when an @At injection point matches 0 times
+//                      (a silently-zero inject is the classic version-port failure mode)
+//   checks          -> escalate soft mixin-validation failures to hard errors
+// Referenced from the neoforge and fabric leaf run configs as project.mixinDebugJvmArgs.
+ext.mixinDebugJvmArgs = [
+        '-Dmixin.debug.export=true',
+        '-Dmixin.debug.verbose=true',
+        '-Dmixin.debug.countInjections=true',
+        '-Dmixin.checks=true',
+]
+
 configurations {
     commonJava{
         canBeResolved = true
