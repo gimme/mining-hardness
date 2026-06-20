@@ -12,7 +12,7 @@ public class Main {
     private final CommonConfig commonConfig;
 
     private Main() {
-        this.commonConfig = new CommonConfig();
+        this.commonConfig = new FcapCommonConfig();
     }
 
     public CommonConfig getCommonConfig() {

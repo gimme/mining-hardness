@@ -11,7 +11,12 @@ import net.minecraft.gametest.framework.GameTestHelper;
 public final class FabricGameTests {
 
     @GameTest
-    public void smoke(GameTestHelper helper) {
-        MiningHardnessGameTests.smoke(helper);
+    public void depthScalingHardensMinedBlock(GameTestHelper helper) {
+        MiningHardnessGameTests.depthScalingHardensMinedBlock(helper);
+    }
+
+    @GameTest
+    public void blacklistedBlockKeepsVanillaHardness(GameTestHelper helper) {
+        MiningHardnessGameTests.blacklistedBlockKeepsVanillaHardness(helper);
     }
 }

@@ -34,7 +34,8 @@ public final class NeoForgeGameTests {
     }
 
     private static final List<Test> TESTS = List.of(
-            new Test("smoke", 20, MiningHardnessGameTests::smoke));
+            new Test("depth_scaling_hardens_mined_block", 20, MiningHardnessGameTests::depthScalingHardensMinedBlock),
+            new Test("blacklisted_block_keeps_vanilla_hardness", 20, MiningHardnessGameTests::blacklistedBlockKeepsVanillaHardness));
 
     private NeoForgeGameTests() {
     }

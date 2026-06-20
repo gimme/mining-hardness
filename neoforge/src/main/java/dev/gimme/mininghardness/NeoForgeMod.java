@@ -8,7 +8,7 @@ import net.neoforged.fml.config.ModConfig;
 public class NeoForgeMod {
 
     public NeoForgeMod(ModContainer container) {
-        container.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, CommonConfig.FILE_NAME);
+        container.registerConfig(ModConfig.Type.COMMON, FcapCommonConfig.SPEC, FcapCommonConfig.FILE_NAME);
 
         Main.init();
     }
