@@ -11,6 +11,25 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
 }
 
+// Dev-only game test source set, shared by every module and kept out of the production jar. Its
+// dependencies are inherited from `main` through configuration extension rather than by mutating
+// compileClasspath with a file collection: IDEs build their classpath from the configuration graph,
+// so `extendsFrom` is what makes them resolve — including the Minecraft dependency the loader plugin
+// injects. main's compiled output is added as a dependency so the tests see the mod's own classes.
+// extendsFrom resolves lazily, so this is safe before the loader plugin populates main's classpath.
+sourceSets {
+    gametest
+}
+
+configurations {
+    gametestCompileClasspath.extendsFrom(compileClasspath)
+    gametestRuntimeClasspath.extendsFrom(runtimeClasspath)
+}
+
+dependencies {
+    gametestImplementation sourceSets.main.output
+}
+
 repositories {
     mavenCentral()
     // https://docs.gradle.org/current/userguide/declaring_repositories.html#declaring_content_exclusively_found_in_one_repository

@@ -1,0 +1,17 @@
+{
+    "schemaVersion": 1,
+    "id": "mininghardness_gametest",
+    "version": "1.0.0",
+    "name": "Mining Hardness Game Tests",
+    "description": "Game tests for Mining Hardness. Dev-only; not shipped in the release jar.",
+    "environment": "server",
+    "entrypoints": {
+        "fabric-gametest": [
+            "dev.gimme.mininghardness.fabric.gametest.FabricGameTests"
+        ]
+    },
+    "depends": {
+        "mininghardness": "*",
+        "fabric-gametest-api-v1": "*"
+    }
+}

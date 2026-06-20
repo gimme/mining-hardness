@@ -16,6 +16,9 @@ configurations {
     commonResources {
         canBeResolved = true
     }
+    commonGametestJava {
+        canBeResolved = true
+    }
 }
 
 dependencies {
@@ -26,11 +29,22 @@ dependencies {
     }
     commonJava project(path: ':common', configuration: 'commonJava')
     commonResources project(path: ':common', configuration: 'commonResources')
+    commonGametestJava project(path: ':common', configuration: 'commonGametestJava')
+
+    // IDE bridge: resolve the shared common gametest types when editing loader gametest wiring. The
+    // build recompiles those sources via commonGametestJava, so this is compileOnly to avoid clashing.
+    gametestCompileOnly project(path: ':common', configuration: 'commonGametestClasses')
 }
 
 tasks.named('compileJava', JavaCompile) {
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
+}
+
+// Pull the shared common gametests in, mirroring compileJava above.
+tasks.named('compileGametestJava', JavaCompile) {
+    dependsOn(configurations.commonGametestJava)
+    source(configurations.commonGametestJava)
 }
 
 processResources {

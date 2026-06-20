@@ -17,6 +17,15 @@ loom {
     if (aw.exists()) {
         accessWidenerPath.set(aw)
     }
+    // Loom groups each source set as its own dev-classpath mod; the gametest mod stays out of the jar.
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+        "${mod_id}_gametest" {
+            sourceSet sourceSets.gametest
+        }
+    }
     runs {
         configureEach {
             jvmArguments.addAll(project.mixinDebugJvmArgs)
@@ -33,5 +42,17 @@ loom {
             generateRunConfig.set(true)
             runDirectory.set(file('runs/server'))
         }
+        gametest {
+            server()
+            source sourceSets.gametest
+            displayName.set('Fabric Game Test')
+            generateRunConfig.set(true)
+            runDirectory.set(file('runs/gametest'))
+            // Fabric API's headless runner + JUnit report. Run: ./gradlew :fabric:runGametest
+            jvmArguments.add('-Dfabric-api.gametest')
+            jvmArguments.add("-Dfabric-api.gametest.report-file=${layout.buildDirectory.file('junit.xml').get().asFile}")
+        }
     }
 }
+
+tasks.named('check') { dependsOn 'runGametest' }

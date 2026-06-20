@@ -61,7 +61,3 @@ Config file: `config/mininghardness-common.toml` (auto-generated on first run).
 - Example whitelist: `stone|deepslate|andesite|calcite|diorite|granite|tuff` to only affect common cave blocks.
 - Example blacklist: `.*_ore` to exclude all ores.
 - Blacklisted blocks are not counted as solid in enclosure scans, so they don't make neighboring blocks harder.
-
-## Credits
-
-Project template: [MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template)
