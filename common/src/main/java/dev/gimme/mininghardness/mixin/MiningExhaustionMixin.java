@@ -18,6 +18,6 @@ public class MiningExhaustionMixin {
 
     @Redirect(method = "playerDestroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
     private void onPlayerDestroyCauseFoodExhaustion(Player instance, float exhaustionAmount, Level level, Player player, BlockPos blockPos, BlockState blockState) {
-        instance.causeFoodExhaustion(Main.INSTANCE.getCommonConfig().getAdjustedExhaustion(exhaustionAmount, blockPos, level));
+        instance.causeFoodExhaustion(Main.INSTANCE.getServerConfig().getAdjustedExhaustion(exhaustionAmount, blockPos, level));
     }
 }

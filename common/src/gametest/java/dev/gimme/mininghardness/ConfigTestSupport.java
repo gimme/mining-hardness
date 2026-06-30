@@ -3,16 +3,16 @@ package dev.gimme.mininghardness;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 
 /**
- * Test-only handles to {@link FcapCommonConfig} values. Lives in the gametest source set's package
+ * Test-only handles to {@link FcapServerConfig} values. Lives in the gametest source set's package
  * alongside the config so it can reach the package-private config fields; production code still
  * exposes only the read-only getters.
  */
 public final class ConfigTestSupport {
 
-    public static final ConfigValue<String> BLOCK_BLACKLIST = FcapCommonConfig.BLOCK_BLACKLIST;
-    public static final ConfigValue<Long> DEPTH_START_Y = FcapCommonConfig.DEPTH_START_Y;
-    public static final ConfigValue<Long> DEPTH_END_Y = FcapCommonConfig.DEPTH_END_Y;
-    public static final ConfigValue<Double> DEPTH_MULTIPLIER_BONUS = FcapCommonConfig.DEPTH_MULTIPLIER_BONUS;
+    public static final ConfigValue<String> BLOCK_BLACKLIST = FcapServerConfig.BLOCK_BLACKLIST;
+    public static final ConfigValue<Long> DEPTH_START_Y = FcapServerConfig.DEPTH_START_Y;
+    public static final ConfigValue<Long> DEPTH_END_Y = FcapServerConfig.DEPTH_END_Y;
+    public static final ConfigValue<Double> DEPTH_MULTIPLIER_BONUS = FcapServerConfig.DEPTH_MULTIPLIER_BONUS;
 
     private ConfigTestSupport() {
     }

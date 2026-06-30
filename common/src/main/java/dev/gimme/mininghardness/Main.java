@@ -9,13 +9,13 @@ public class Main {
         return INSTANCE;
     }
 
-    private final CommonConfig commonConfig;
+    private final ServerConfig serverConfig;
 
     private Main() {
-        this.commonConfig = new FcapCommonConfig();
+        this.serverConfig = new FcapServerConfig();
     }
 
-    public CommonConfig getCommonConfig() {
-        return commonConfig;
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 }

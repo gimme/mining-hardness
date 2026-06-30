@@ -17,6 +17,9 @@
     "entrypoints": {
         "main": [
             "dev.gimme.mininghardness.fabric.FabricMod"
+        ],
+        "client": [
+            "dev.gimme.mininghardness.fabric.client.FabricClientMod"
         ]
     },
     "mixins": [

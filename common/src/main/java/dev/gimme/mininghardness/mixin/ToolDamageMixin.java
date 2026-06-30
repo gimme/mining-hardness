@@ -20,6 +20,6 @@ public class ToolDamageMixin {
 
     @Redirect(method = "mineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;)V"))
     private void onMineBlockHurtAndBreak(ItemStack instance, int damageAmount, LivingEntity miningEntity, EquipmentSlot equipmentSlot, ItemStack itemStack, Level level, BlockState blockState, BlockPos blockPos) {
-        instance.hurtAndBreak(Main.INSTANCE.getCommonConfig().getAdjustedToolDamage(damageAmount, blockPos, level), miningEntity, equipmentSlot);
+        instance.hurtAndBreak(Main.INSTANCE.getServerConfig().getAdjustedToolDamage(damageAmount, blockPos, level), miningEntity, equipmentSlot);
     }
 }

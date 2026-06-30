@@ -20,6 +20,11 @@ public final class FabricGameTests {
         MiningHardnessGameTests.blacklistedBlockKeepsVanillaHardness(helper);
     }
 
+    @GameTest
+    public void configSettingsSurviveNetworkRoundTrip(GameTestHelper helper) {
+        MiningHardnessGameTests.configSettingsSurviveNetworkRoundTrip(helper);
+    }
+
     // Async (real server ticks) — digs the block twice (unhardened then hardened), so maxTicks must cover both.
 
     @GameTest(maxTicks = 200)

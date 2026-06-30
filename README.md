@@ -8,7 +8,7 @@ The intent is to make mining a more strategic activity — the deeper you go, th
 
 ![Logo](/images/logo.png)
 
-> **Note:** The mod must be installed on both the client and server with matching configurations.
+> **Note:** The mod must be installed on both the client and server. Configure it on the server — those settings are synced to each client automatically, so client config files don't need to match.
 
 ## Features
 

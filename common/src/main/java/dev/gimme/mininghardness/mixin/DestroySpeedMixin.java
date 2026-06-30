@@ -19,6 +19,6 @@ public class DestroySpeedMixin {
     @Inject(at = @At("RETURN"), method = "getDestroySpeed", cancellable = true)
     private void onGetDestroySpeed(BlockGetter level, BlockPos blockPos, CallbackInfoReturnable<Float> cir) {
         if (!(level instanceof Level realLevel)) return;
-        cir.setReturnValue(Main.INSTANCE.getCommonConfig().getAdjustedHardness(cir.getReturnValue(), blockPos, realLevel));
+        cir.setReturnValue(Main.INSTANCE.getServerConfig().getAdjustedHardness(cir.getReturnValue(), blockPos, realLevel));
     }
 }

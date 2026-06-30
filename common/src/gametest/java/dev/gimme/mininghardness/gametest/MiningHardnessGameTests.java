@@ -2,11 +2,14 @@ package dev.gimme.mininghardness.gametest;
 
 import com.mojang.authlib.GameProfile;
 import dev.gimme.mininghardness.ConfigTestSupport;
+import dev.gimme.mininghardness.HardnessSettings;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -127,6 +130,30 @@ public final class MiningHardnessGameTests {
                                     + isolatedDigTicks[0] + " ticks vs encased " + encasedDigTicks + " ticks");
                 })
                 .thenSucceed();
+    }
+
+    // ---- config sync: the streamed snapshot survives the wire ----
+
+    /**
+     * The streamed {@link HardnessSettings} survives a network encode→decode unchanged. Guards the hand-written
+     * {@code STREAM_CODEC} against silent field drift — in particular a reorder of two same-typed fields (there are five
+     * {@code long}s and several {@code double}s), which the compiler can't catch but which would swap their values on
+     * the wire and desync client prediction. Every field gets a distinct value, so any such swap fails the round-trip;
+     * the leftover-bytes check additionally catches a read/write width mismatch (e.g. {@code readInt} vs {@code writeLong}).
+     */
+    public static void configSettingsSurviveNetworkRoundTrip(GameTestHelper helper) {
+        HardnessSettings original = new HardnessSettings(
+                11L, -22L, 3.5, 4.5, 5.5, 66L, -77L, 88L, 9.5, 10.5, 11.5, "stone|deepslate", ".*_ore", 12.5);
+
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        HardnessSettings.STREAM_CODEC.encode(buf, original);
+        HardnessSettings decoded = HardnessSettings.STREAM_CODEC.decode(buf);
+
+        helper.assertTrue(decoded.equals(original),
+                "config settings changed across a network round-trip: " + original + " -> " + decoded);
+        helper.assertTrue(!buf.isReadable(),
+                "codec left " + buf.readableBytes() + " unread byte(s) — read and write are out of sync");
+        helper.succeed();
     }
 
     // ---- helpers ----

@@ -36,6 +36,7 @@ public final class NeoForgeGameTests {
     private static final List<Test> TESTS = List.of(
             new Test("depth_scaling_hardens_mined_block", 20, MiningHardnessGameTests::depthScalingHardensMinedBlock),
             new Test("blacklisted_block_keeps_vanilla_hardness", 20, MiningHardnessGameTests::blacklistedBlockKeepsVanillaHardness),
+            new Test("config_settings_survive_network_round_trip", 20, MiningHardnessGameTests::configSettingsSurviveNetworkRoundTrip),
             // Survival mining over real ticks (async) — digs the block twice (unhardened then hardened).
             new Test("mod_hardening_slows_survival_mining_over_ticks", 200, MiningHardnessGameTests::modHardeningSlowsSurvivalMiningOverTicks));
 

@@ -6,6 +6,7 @@
   "mixins": [
     "DestroySpeedMixin",
     "ToolDamageMixin",
-    "MiningExhaustionMixin"
+    "MiningExhaustionMixin",
+    "ServerPlayerMixin"
   ]
 }
