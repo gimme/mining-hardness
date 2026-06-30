@@ -27,74 +27,74 @@ public class FcapServerConfig implements ServerConfig {
 
     // --- depth ---
 
-    static final ConfigValue<Long> DEPTH_START_Y = BUILDER
+    static final ConfigValue<Integer> DEPTH_START_Y = BUILDER
             .comment("Y level at which depth-based difficulty begins increasing.")
-            .define("depth.startY", 62L);
+            .define("depth.startY", 62);
 
-    static final ConfigValue<Long> DEPTH_END_Y = BUILDER
+    static final ConfigValue<Integer> DEPTH_END_Y = BUILDER
             .comment("Y level at which depth factor reaches 1.0 (maximum).")
-            .define("depth.endY", -64L);
+            .define("depth.endY", -64);
 
-    static final ConfigValue<Double> DEPTH_MULTIPLIER_BONUS = BUILDER
+    static final ConfigValue<Number> DEPTH_MULTIPLIER_BONUS = BUILDER
             .comment("""
                 Extra multiplier applied purely from depth, independent of enclosure.
                 At 0.0 depth alone has no effect; at 1.0 depth alone can double hardness at max depth.""")
-            .define("depth.multiplierBonus", 0.0);
+            .define("depth.multiplierBonus", 0.0, o -> o instanceof Number);
 
     // --- enclosure ---
 
-    private static final ConfigValue<Double> ENCLOSURE_EXPONENT = BUILDER
+    private static final ConfigValue<Number> ENCLOSURE_EXPONENT = BUILDER
             .comment("""
                 Controls how steeply enclosure scales from 0 to 1.
                 Enclosure is measured by scanning a 5x5x5 area around the block, weighting nearby solid blocks more heavily.
                 The raw enclosure value (0.0-1.0) is raised to this power before applying the multiplier bonus.
                 Higher values make low enclosure nearly irrelevant while high enclosure ramps up steeply.
                 Example with exponent 5: 30% enclosure -> 0.2% effect, 50% -> 3.1%, 70% -> 16.8%, 90% -> 59.0%.""")
-            .define("enclosure.exponent", 5.0);
+            .define("enclosure.exponent", 5.0, o -> o instanceof Number);
 
-    private static final ConfigValue<Double> ENCLOSURE_MULTIPLIER_BONUS = BUILDER
+    private static final ConfigValue<Number> ENCLOSURE_MULTIPLIER_BONUS = BUILDER
             .comment("""
                 Maximum hardness multiplier bonus when fully enclosed at max depth.
                 The actual multiplier scales between 1x and (1 + this value)x based on enclosure and depth.
                 E.g. 15.0 means fully enclosed blocks at max depth get a 16x multiplier.""")
-            .define("enclosure.multiplierBonus", 15.0);
+            .define("enclosure.multiplierBonus", 15.0, o -> o instanceof Number);
 
     // --- nether ---
 
-    private static final ConfigValue<Long> NETHER_START_Y = BUILDER
+    private static final ConfigValue<Integer> NETHER_START_Y = BUILDER
             .comment("Start Y for the Nether dimension. Set startY == endY to always use max depth factor.")
-            .define("nether.startY", 128L);
+            .define("nether.startY", 128);
 
-    private static final ConfigValue<Long> NETHER_END_Y = BUILDER
+    private static final ConfigValue<Integer> NETHER_END_Y = BUILDER
             .comment("End Y for the Nether dimension.")
-            .define("nether.endY", 128L);
+            .define("nether.endY", 128);
 
     // --- hardness soft cap ---
 
-    private static final ConfigValue<Long> HARDNESS_SOFT_CAP = BUILDER
+    private static final ConfigValue<Integer> HARDNESS_SOFT_CAP = BUILDER
             .comment("Hardness value above which the soft cap multiplier is applied. Obsidian has a hardness of 50.")
-            .define("softCap.threshold", 50L);
+            .define("softCap.threshold", 50);
 
     private static final ConfigValue<Double> HARDNESS_SOFT_CAP_MULTIPLIER = BUILDER
             .comment("""
                 Multiplier applied to hardness values above the soft cap.
                 For example, a value of 0.2 means that an excess hardness of 10 above the soft cap will only put the final hardness
                 2 above the soft cap.""")
-            .define("softCap.multiplier", 0.2);
+            .defineInRange("softCap.multiplier", 0.2, 0.0, 1.0);
 
     // --- effects ---
 
-    private static final ConfigValue<Double> TOOL_DAMAGE_HARDNESS_MULTIPLIER = BUILDER
+    private static final ConfigValue<Number> TOOL_DAMAGE_HARDNESS_MULTIPLIER = BUILDER
             .comment("""
                 How much tool damage is affected by the adjusted block hardness. For example, if set to 1.0, tool damage scales
                 linearly with the increase in hardness. Keep in mind that tools only take damage in whole numbers (default 1 per block),
                 and this effect takes the floor of the calculated damage (i.e., 1.9 becomes 1, 2.0 becomes 2).
                 Vanilla: 0.0""")
-            .define("effects.toolDamageMultiplier", 1.0);
+            .define("effects.toolDamageMultiplier", 1.0, o -> o instanceof Number);
 
-    private static final ConfigValue<Double> EXHAUSTION_HARDNESS_MULTIPLIER = BUILDER
+    private static final ConfigValue<Number> EXHAUSTION_HARDNESS_MULTIPLIER = BUILDER
             .comment("How much exhaustion is affected by the adjusted block hardness.")
-            .define("effects.exhaustionMultiplier", 2.0);
+            .define("effects.exhaustionMultiplier", 2.0, o -> o instanceof Number);
 
     // --- scope ---
 
@@ -117,7 +117,7 @@ public class FcapServerConfig implements ServerConfig {
                 0.0 means exempted blocks are completely unaffected (default).
                 1.0 means the lists have no effect (all blocks fully affected).
                 0.5 means exempted blocks get half the hardness increase.""")
-            .define("scope.exemptMultiplier", 0.0);
+            .defineInRange("scope.exemptMultiplier", 0.0, 0.0, 1.0);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 
@@ -127,11 +127,11 @@ public class FcapServerConfig implements ServerConfig {
      */
     public static HardnessSettings snapshot() {
         return new HardnessSettings(
-                DEPTH_START_Y.get(), DEPTH_END_Y.get(), DEPTH_MULTIPLIER_BONUS.get(),
-                ENCLOSURE_EXPONENT.get(), ENCLOSURE_MULTIPLIER_BONUS.get(),
+                DEPTH_START_Y.get(), DEPTH_END_Y.get(), DEPTH_MULTIPLIER_BONUS.get().doubleValue(),
+                ENCLOSURE_EXPONENT.get().doubleValue(), ENCLOSURE_MULTIPLIER_BONUS.get().doubleValue(),
                 NETHER_START_Y.get(), NETHER_END_Y.get(),
                 HARDNESS_SOFT_CAP.get(), HARDNESS_SOFT_CAP_MULTIPLIER.get(),
-                TOOL_DAMAGE_HARDNESS_MULTIPLIER.get(), EXHAUSTION_HARDNESS_MULTIPLIER.get(),
+                TOOL_DAMAGE_HARDNESS_MULTIPLIER.get().doubleValue(), EXHAUSTION_HARDNESS_MULTIPLIER.get().doubleValue(),
                 BLOCK_WHITELIST.get(), BLOCK_BLACKLIST.get(), EXEMPT_MULTIPLIER.get());
     }
 

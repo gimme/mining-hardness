@@ -14,14 +14,14 @@ import net.minecraft.network.codec.StreamCodec;
  * snapshot fully describes the config and a single code path serves both sides.
  */
 public record HardnessSettings(
-        long depthStartY,
-        long depthEndY,
+        int depthStartY,
+        int depthEndY,
         double depthMultiplierBonus,
         double enclosureExponent,
         double enclosureMultiplierBonus,
-        long netherStartY,
-        long netherEndY,
-        long softCapThreshold,
+        int netherStartY,
+        int netherEndY,
+        int softCapThreshold,
         double softCapMultiplier,
         double toolDamageMultiplier,
         double exhaustionMultiplier,
@@ -33,14 +33,14 @@ public record HardnessSettings(
             StreamCodec.of(HardnessSettings::write, HardnessSettings::read);
 
     private static void write(FriendlyByteBuf buf, HardnessSettings s) {
-        buf.writeLong(s.depthStartY);
-        buf.writeLong(s.depthEndY);
+        buf.writeInt(s.depthStartY);
+        buf.writeInt(s.depthEndY);
         buf.writeDouble(s.depthMultiplierBonus);
         buf.writeDouble(s.enclosureExponent);
         buf.writeDouble(s.enclosureMultiplierBonus);
-        buf.writeLong(s.netherStartY);
-        buf.writeLong(s.netherEndY);
-        buf.writeLong(s.softCapThreshold);
+        buf.writeInt(s.netherStartY);
+        buf.writeInt(s.netherEndY);
+        buf.writeInt(s.softCapThreshold);
         buf.writeDouble(s.softCapMultiplier);
         buf.writeDouble(s.toolDamageMultiplier);
         buf.writeDouble(s.exhaustionMultiplier);
@@ -51,10 +51,10 @@ public record HardnessSettings(
 
     private static HardnessSettings read(FriendlyByteBuf buf) {
         return new HardnessSettings(
-                buf.readLong(), buf.readLong(), buf.readDouble(),
+                buf.readInt(), buf.readInt(), buf.readDouble(),
                 buf.readDouble(), buf.readDouble(),
-                buf.readLong(), buf.readLong(),
-                buf.readLong(), buf.readDouble(),
+                buf.readInt(), buf.readInt(),
+                buf.readInt(), buf.readDouble(),
                 buf.readDouble(), buf.readDouble(),
                 buf.readUtf(), buf.readUtf(), buf.readDouble());
     }

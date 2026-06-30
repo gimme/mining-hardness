@@ -10,9 +10,9 @@ import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 public final class ConfigTestSupport {
 
     public static final ConfigValue<String> BLOCK_BLACKLIST = FcapServerConfig.BLOCK_BLACKLIST;
-    public static final ConfigValue<Long> DEPTH_START_Y = FcapServerConfig.DEPTH_START_Y;
-    public static final ConfigValue<Long> DEPTH_END_Y = FcapServerConfig.DEPTH_END_Y;
-    public static final ConfigValue<Double> DEPTH_MULTIPLIER_BONUS = FcapServerConfig.DEPTH_MULTIPLIER_BONUS;
+    public static final ConfigValue<Integer> DEPTH_START_Y = FcapServerConfig.DEPTH_START_Y;
+    public static final ConfigValue<Integer> DEPTH_END_Y = FcapServerConfig.DEPTH_END_Y;
+    public static final ConfigValue<Number> DEPTH_MULTIPLIER_BONUS = FcapServerConfig.DEPTH_MULTIPLIER_BONUS;
 
     private ConfigTestSupport() {
     }

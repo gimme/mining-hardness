@@ -137,13 +137,13 @@ public final class MiningHardnessGameTests {
     /**
      * The streamed {@link HardnessSettings} survives a network encode→decode unchanged. Guards the hand-written
      * {@code STREAM_CODEC} against silent field drift — in particular a reorder of two same-typed fields (there are five
-     * {@code long}s and several {@code double}s), which the compiler can't catch but which would swap their values on
+     * {@code int}s and several {@code double}s), which the compiler can't catch but which would swap their values on
      * the wire and desync client prediction. Every field gets a distinct value, so any such swap fails the round-trip;
-     * the leftover-bytes check additionally catches a read/write width mismatch (e.g. {@code readInt} vs {@code writeLong}).
+     * the leftover-bytes check additionally catches a read/write width mismatch (e.g. {@code readInt} vs {@code writeDouble}).
      */
     public static void configSettingsSurviveNetworkRoundTrip(GameTestHelper helper) {
         HardnessSettings original = new HardnessSettings(
-                11L, -22L, 3.5, 4.5, 5.5, 66L, -77L, 88L, 9.5, 10.5, 11.5, "stone|deepslate", ".*_ore", 12.5);
+                11, -22, 3.5, 4.5, 5.5, 66, -77, 88, 9.5, 10.5, 11.5, "stone|deepslate", ".*_ore", 12.5);
 
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         HardnessSettings.STREAM_CODEC.encode(buf, original);
@@ -221,7 +221,7 @@ public final class MiningHardnessGameTests {
 
     /** Pins depth scaling so the block at {@code pos} sits exactly at full depth, with depth alone doubling hardness. */
     private static ConfigTestSupport.Scope pinFullDepthAt(BlockPos pos) {
-        long y = pos.getY();
+        int y = pos.getY();
         var startY = ConfigTestSupport.override(ConfigTestSupport.DEPTH_START_Y, y + 1);
         var endY = ConfigTestSupport.override(ConfigTestSupport.DEPTH_END_Y, y);
         var bonus = ConfigTestSupport.override(ConfigTestSupport.DEPTH_MULTIPLIER_BONUS, 1.0);

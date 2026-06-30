@@ -53,7 +53,7 @@ final class HardnessCalculator {
         float effectiveMultiplier = getEffectiveMultiplier(pos.getY(), enclosure, level, effectFactor);
         float newHardness = defaultHardness * effectiveMultiplier;
 
-        int hardnessSoftCap = (int) settings.softCapThreshold();
+        int hardnessSoftCap = settings.softCapThreshold();
         if (newHardness > hardnessSoftCap) {
             float softCapMultiplier = (float) settings.softCapMultiplier();
             newHardness = hardnessSoftCap + (newHardness - hardnessSoftCap) * softCapMultiplier;
@@ -121,11 +121,11 @@ final class HardnessCalculator {
     private float getDepthFactor(int y, @NotNull Level level) {
         int startY, endY;
         if (level.dimension().equals(Level.NETHER)) {
-            startY = (int) settings.netherStartY();
-            endY = (int) settings.netherEndY();
+            startY = settings.netherStartY();
+            endY = settings.netherEndY();
         } else {
-            startY = (int) settings.depthStartY();
-            endY = (int) settings.depthEndY();
+            startY = settings.depthStartY();
+            endY = settings.depthEndY();
         }
         if (startY <= endY) return 1.0f;
         return Mth.clamp((float) (startY - y) / (startY - endY), 0.0f, 1.0f);
