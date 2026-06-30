@@ -62,7 +62,7 @@ jobs:
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create ${{ steps.vars.outputs.tag }} ./build-artifact/*.jar --title ${{ steps.vars.outputs.tag }} --notes '${{ steps.changelog.outputs.release_notes }}'
+        run: gh release create ${{ steps.vars.outputs.tag }} ./build-artifact/**/build/libs/*.jar --title ${{ steps.vars.outputs.tag }} --notes '${{ steps.changelog.outputs.release_notes }}'
     needs:
       - build
 
@@ -73,7 +73,7 @@ jobs:
     strategy:
       matrix:
         # List of loaders to publish for
-        loader: [neoforge]
+        loader: [fabric, neoforge]
       fail-fast: false
     steps:
       - name: Download build artifact
@@ -94,7 +94,7 @@ jobs:
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           # General
-          files: ./build-artifact/*-${{ matrix.loader }}-${{ needs.release.outputs.full_version }}.jar
+          files: ./build-artifact/${{ matrix.loader }}/build/libs/*-${{ matrix.loader }}-${{ needs.release.outputs.full_version }}.jar
           name: '${{ needs.release.outputs.mod_id }}-${{ matrix.loader }}-${{ needs.release.outputs.full_version }}'
           version: '${{ needs.release.outputs.full_version }}'
           changelog: ${{ needs.release.outputs.changelog }}
