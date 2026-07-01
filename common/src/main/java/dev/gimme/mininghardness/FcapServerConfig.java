@@ -28,95 +28,122 @@ public class FcapServerConfig implements ServerConfig {
     // --- depth ---
 
     static final ConfigValue<Integer> DEPTH_START_Y = BUILDER
-            .comment("Y level at which depth-based difficulty begins increasing.")
+            .comment("""
+                Y level where mining starts getting harder in the Overworld.
+                Above this, everything is normal.""")
             .define("depth.startY", 62);
 
     static final ConfigValue<Integer> DEPTH_END_Y = BUILDER
-            .comment("Y level at which depth factor reaches 1.0 (maximum).")
+            .comment("""
+                Y level where depth's effect on hardness maxes out in the Overworld.
+                At or below this, depth contributes its full bonus.""")
             .define("depth.endY", -64);
 
     static final ConfigValue<Number> DEPTH_MULTIPLIER_BONUS = BUILDER
             .comment("""
-                Extra multiplier applied purely from depth, independent of enclosure.
-                At 0.0 depth alone has no effect; at 1.0 depth alone can double hardness at max depth.""")
+                How much harder blocks get purely from being deep, regardless of how boxed in they are.
+                0.0 disables this depth-alone effect entirely; 1.5 makes blocks at max depth 150% harder from depth alone
+                (before enclosure is factored in).
+                The default is 0 because Deepslate already kind of does this naturally.""")
             .define("depth.multiplierBonus", 0.0, o -> o instanceof Number);
 
     // --- enclosure ---
 
     private static final ConfigValue<Number> ENCLOSURE_EXPONENT = BUILDER
             .comment("""
-                Controls how steeply enclosure scales from 0 to 1.
-                Enclosure is measured by scanning a 5x5x5 area around the block, weighting nearby solid blocks more heavily.
-                The raw enclosure value (0.0-1.0) is raised to this power before applying the multiplier bonus.
-                Higher values make low enclosure nearly irrelevant while high enclosure ramps up steeply.
-                Example with exponent 5: 30% enclosure -> 0.2% effect, 50% -> 3.1%, 70% -> 16.8%, 90% -> 59.0%.""")
+                Enclosure is how boxed-in a block is by nearby solid blocks, scanned in a 5x5x5 area centered on it,
+                from 0% (floating in the air) to 100% (fully surrounded). Along with depth, it's one of the two inputs
+                that drive the hardness bonus. When mining into a plain wall the block is about 65% enclosed; digging
+                straight down in a plain 1-wide shaft (where only the blocks straight above are air) reaches about 96%
+                (realistic worst case).
+                
+                This setting shapes how enclosure turns into extra hardness. Low values ramp the bonus up gradually as
+                enclosure increases; high values keep it at almost no effect until a block is very enclosed, then starts
+                spiking sharply, so open caverns stay easy while tight tunnels get much harder.
+                Default 5.0:
+                  - mining into a wall (~65% enclosed) gets you about 12% of the max bonus;
+                  - mining straight down (~96% enclosed) gets you about 81% of the max bonus.
+                The actual formula (at max depth) is `multiplierBonus * enclosure^exponent = bonus hardness`.""")
             .define("enclosure.exponent", 5.0, o -> o instanceof Number);
 
     private static final ConfigValue<Number> ENCLOSURE_MULTIPLIER_BONUS = BUILDER
             .comment("""
-                Maximum hardness multiplier bonus when fully enclosed at max depth.
-                The actual multiplier scales between 1x and (1 + this value)x based on enclosure and depth.
-                E.g. 15.0 means fully enclosed blocks at max depth get a 16x multiplier.""")
+                How much harder a fully enclosed block is, at maximum depth.
+                Note: this bonus still scales (linearly) with depth. Above `depth.startY` it has no effect at all,
+                no matter how boxed in a block is.
+                Default 15.0: a fully enclosed block at max depth is 1500% harder to mine.""")
             .define("enclosure.multiplierBonus", 15.0, o -> o instanceof Number);
 
     // --- nether ---
 
     private static final ConfigValue<Integer> NETHER_START_Y = BUILDER
-            .comment("Start Y for the Nether dimension. Set startY == endY to always use max depth factor.")
+            .comment("""
+                Same as `depth.startY`, but for the Nether.""")
             .define("nether.startY", 128);
 
     private static final ConfigValue<Integer> NETHER_END_Y = BUILDER
-            .comment("End Y for the Nether dimension.")
+            .comment("""
+                Same as `depth.endY`, but for the Nether.
+                Set equal to `nether.startY` to make depth always maxed out, which is recommended since the Nether
+                doesn't really have a natural shallow level like the Overworld's surface.""")
             .define("nether.endY", 128);
 
     // --- hardness soft cap ---
 
     private static final ConfigValue<Integer> HARDNESS_SOFT_CAP = BUILDER
-            .comment("Hardness value above which the soft cap multiplier is applied. Obsidian has a hardness of 50.")
+            .comment("""
+                Hardness value above which extra hardness gets dampened (see `softCap.multiplier`), so a few extremely
+                hard block types don't become absurdly slow to mine.
+                For reference, Obsidian's natural hardness is 50; Deepslate is 3.""")
             .define("softCap.threshold", 50);
 
     private static final ConfigValue<Double> HARDNESS_SOFT_CAP_MULTIPLIER = BUILDER
             .comment("""
-                Multiplier applied to hardness values above the soft cap.
-                For example, a value of 0.2 means that an excess hardness of 10 above the soft cap will only put the final hardness
-                2 above the soft cap.""")
+                How much of the hardness above `softCap.threshold` actually counts.
+                1.0 = no dampening; 0.0 = hardness can never exceed the threshold.
+                Default 0.2: Every 10 points of hardness above the threshold only adds 2 points to the final hardness.""")
             .defineInRange("softCap.multiplier", 0.2, 0.0, 1.0);
 
     // --- effects ---
 
     private static final ConfigValue<Number> TOOL_DAMAGE_HARDNESS_MULTIPLIER = BUILDER
             .comment("""
-                How much tool damage is affected by the adjusted block hardness. For example, if set to 1.0, tool damage scales
-                linearly with the increase in hardness. Keep in mind that tools only take damage in whole numbers (default 1 per block),
-                and this effect takes the floor of the calculated damage (i.e., 1.9 becomes 1, 2.0 becomes 2).
-                Vanilla: 0.0""")
+                How much extra durability damage tools take on hardness-boosted blocks.
+                0.0 = vanilla behavior, tools always take normal damage regardless of hardness.
+                1.0 = tool damage scales up right along with hardness, e.g. a block that's 2x as hard (from this mod's
+                effect) deals 2x the durability damage. Damage is still whole numbers, rounded down.""")
             .define("effects.toolDamageMultiplier", 1.0, o -> o instanceof Number);
 
     private static final ConfigValue<Number> EXHAUSTION_HARDNESS_MULTIPLIER = BUILDER
-            .comment("How much exhaustion is affected by the adjusted block hardness.")
+            .comment("""
+                How much extra hunger (exhaustion) mining hardness-boosted blocks costs.
+                Works the same way as `effects.toolDamageMultiplier`: 0.0 = vanilla exhaustion, 1.0 = exhaustion scales
+                up right along with hardness.""")
             .define("effects.exhaustionMultiplier", 2.0, o -> o instanceof Number);
 
     // --- scope ---
 
     private static final ConfigValue<String> BLOCK_WHITELIST = BUILDER
             .comment("""
-                Regex pattern of block IDs to apply the hardness adjustments to. If empty, all blocks are affected.
-                Example: "stone|deepslate|andesite|calcite|diorite|granite|tuff" to match the common cave blocks.""")
+                Only blocks whose ID matches this regex get the hardness adjustment; every other block is left at vanilla
+                hardness (or scaled down, see `scope.exemptMultiplier`). Leave empty to affect all blocks.
+                Example: "stone|deepslate|andesite|calcite|diorite|granite|tuff" to only affect common cave blocks.""")
             .define("scope.blockWhitelist", "");
 
     static final ConfigValue<String> BLOCK_BLACKLIST = BUILDER
             .comment("""
-                Regex pattern of block IDs to exclude from the hardness adjustments.
-                Blacklisted blocks are also not counted as solid in the enclosure scan, so they don't make neighboring blocks harder.
-                Example: ".*_ore" to exclude all ores.""")
+                All blocks whose ID matches this regex are excluded from the hardness adjustment (see
+                `scope.exemptMultiplier`) and are also ignored by the enclosure scan, so they won't make neighboring
+                blocks count as more enclosed.
+                Example: ".*_ore" to leave all ores at their vanilla hardness.""")
             .define("scope.blockBlacklist", "");
 
     private static final ConfigValue<Double> EXEMPT_MULTIPLIER = BUILDER
             .comment("""
-                How much of the hardness effect is applied to blocks exempted by the white-/blacklist.
-                0.0 means exempted blocks are completely unaffected (default).
-                1.0 means the lists have no effect (all blocks fully affected).
-                0.5 means exempted blocks get half the hardness increase.""")
+                How much of the hardness bonus still applies to blocks excluded by scope.blockWhitelist /
+                scope.blockBlacklist.
+                0.0 = fully exempt, vanilla hardness (default). 1.0 = the lists don't actually exempt anything.
+                0.5 = exempt blocks get half the usual bonus.""")
             .defineInRange("scope.exemptMultiplier", 0.0, 0.0, 1.0);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
