@@ -70,7 +70,7 @@ public final class MiningHardnessGameTests {
 
         try (var _ = pinFullDepthAt(pos)) {
             float hardened = level.getBlockState(pos).getDestroySpeed(level, pos);
-            // depthMultiplierBonus 1.0 at full depth alone doubles hardness; enclosure can only add more.
+            // depthMaxBonus 1.0 at full depth alone doubles hardness; enclosure can only add more.
             helper.assertTrue(hardened >= vanilla * 2f - 0.01f,
                     "full-depth scaling should at least double the mined block's hardness: expected >= "
                             + (vanilla * 2f) + " but was " + hardened);
@@ -224,7 +224,7 @@ public final class MiningHardnessGameTests {
         int y = pos.getY();
         var startY = ConfigTestSupport.override(ConfigTestSupport.DEPTH_START_Y, y + 1);
         var endY = ConfigTestSupport.override(ConfigTestSupport.DEPTH_END_Y, y);
-        var bonus = ConfigTestSupport.override(ConfigTestSupport.DEPTH_MULTIPLIER_BONUS, 1.0);
+        var bonus = ConfigTestSupport.override(ConfigTestSupport.DEPTH_MAX_BONUS, 1.0);
         return () -> {
             bonus.close();
             endY.close();

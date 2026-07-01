@@ -138,13 +138,13 @@ final class HardnessCalculator {
         float depthFactor = getDepthFactor(y, level);
 
         float exponent = (float) settings.enclosureExponent();
-        float multiplierBonus = (float) settings.enclosureMultiplierBonus();
-        float depthMultiplierBonus = (float) settings.depthMultiplierBonus();
+        float maxBonus = (float) settings.enclosureMaxBonus();
+        float depthMaxBonus = (float) settings.depthMaxBonus();
 
         float adjustedEnclosure = (float) Math.pow(enclosure, exponent);
 
-        float enclosureEffect = 1 + multiplierBonus * adjustedEnclosure * depthFactor;
-        float depthEffect = 1 + depthFactor * depthMultiplierBonus;
+        float enclosureEffect = 1 + maxBonus * adjustedEnclosure * depthFactor;
+        float depthEffect = 1 + depthFactor * depthMaxBonus;
 
         return enclosureEffect * depthEffect;
     }

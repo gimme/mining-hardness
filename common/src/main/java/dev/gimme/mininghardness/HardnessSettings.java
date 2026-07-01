@@ -16,9 +16,9 @@ import net.minecraft.network.codec.StreamCodec;
 public record HardnessSettings(
         int depthStartY,
         int depthEndY,
-        double depthMultiplierBonus,
+        double depthMaxBonus,
         double enclosureExponent,
-        double enclosureMultiplierBonus,
+        double enclosureMaxBonus,
         int netherStartY,
         int netherEndY,
         int softCapThreshold,
@@ -35,9 +35,9 @@ public record HardnessSettings(
     private static void write(FriendlyByteBuf buf, HardnessSettings s) {
         buf.writeInt(s.depthStartY);
         buf.writeInt(s.depthEndY);
-        buf.writeDouble(s.depthMultiplierBonus);
+        buf.writeDouble(s.depthMaxBonus);
         buf.writeDouble(s.enclosureExponent);
-        buf.writeDouble(s.enclosureMultiplierBonus);
+        buf.writeDouble(s.enclosureMaxBonus);
         buf.writeInt(s.netherStartY);
         buf.writeInt(s.netherEndY);
         buf.writeInt(s.softCapThreshold);

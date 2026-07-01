@@ -39,13 +39,13 @@ public class FcapServerConfig implements ServerConfig {
                 At or below this, depth contributes its full bonus.""")
             .define("depth.endY", -64);
 
-    static final ConfigValue<Number> DEPTH_MULTIPLIER_BONUS = BUILDER
+    static final ConfigValue<Number> DEPTH_MAX_BONUS = BUILDER
             .comment("""
                 How much harder blocks get purely from being deep, regardless of how boxed in they are.
                 0.0 disables this depth-alone effect entirely; 1.5 makes blocks at max depth 150% harder from depth alone
                 (before enclosure is factored in).
                 The default is 0 because Deepslate already kind of does this naturally.""")
-            .define("depth.multiplierBonus", 0.0, o -> o instanceof Number);
+            .define("depth.maxBonus", 0.0, o -> o instanceof Number);
 
     // --- enclosure ---
 
@@ -63,16 +63,16 @@ public class FcapServerConfig implements ServerConfig {
                 Default 8.0:
                   - mining into a wall (~65% enclosed) gets you ~3% of the max bonus;
                   - mining straight down (~96% enclosed) gets you ~72% of the max bonus.
-                The actual formula (at max depth) is `multiplierBonus * enclosure^exponent = bonus hardness`.""")
+                The actual formula (at max depth) is `maxBonus * enclosure^exponent = bonus hardness`.""")
             .define("enclosure.exponent", 8.0, o -> o instanceof Number);
 
-    private static final ConfigValue<Number> ENCLOSURE_MULTIPLIER_BONUS = BUILDER
+    private static final ConfigValue<Number> ENCLOSURE_MAX_BONUS = BUILDER
             .comment("""
                 How much harder a fully enclosed block is, at maximum depth.
                 Note: this bonus still scales (linearly) with depth. Above `depth.startY` it has no effect at all,
                 no matter how boxed in a block is.
                 Default 15.0: a fully enclosed block at max depth is 1500% harder to mine.""")
-            .define("enclosure.multiplierBonus", 15.0, o -> o instanceof Number);
+            .define("enclosure.maxBonus", 15.0, o -> o instanceof Number);
 
     // --- nether ---
 
@@ -154,8 +154,8 @@ public class FcapServerConfig implements ServerConfig {
      */
     public static HardnessSettings snapshot() {
         return new HardnessSettings(
-                DEPTH_START_Y.get(), DEPTH_END_Y.get(), DEPTH_MULTIPLIER_BONUS.get().doubleValue(),
-                ENCLOSURE_EXPONENT.get().doubleValue(), ENCLOSURE_MULTIPLIER_BONUS.get().doubleValue(),
+                DEPTH_START_Y.get(), DEPTH_END_Y.get(), DEPTH_MAX_BONUS.get().doubleValue(),
+                ENCLOSURE_EXPONENT.get().doubleValue(), ENCLOSURE_MAX_BONUS.get().doubleValue(),
                 NETHER_START_Y.get(), NETHER_END_Y.get(),
                 HARDNESS_SOFT_CAP.get(), HARDNESS_SOFT_CAP_MULTIPLIER.get(),
                 TOOL_DAMAGE_HARDNESS_MULTIPLIER.get().doubleValue(), EXHAUSTION_HARDNESS_MULTIPLIER.get().doubleValue(),
