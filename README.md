@@ -26,11 +26,11 @@ Two factors determine the hardness multiplier:
 
 1. **Depth factor** (0–1): Linear interpolation between sea level and bedrock. In the Nether, max depth factor is always applied.
 
-2. **Enclosure** (0–1): How surrounded a block is by solid blocks in a 5x5x5 area. The raw value is raised to an exponent (default 8) so low enclosure has almost no effect while high enclosure ramps up steeply.
+2. **Enclosure** (0–1): How surrounded a block is by solid blocks in a 5x5x5 area. The raw value is raised to an exponent (default 7) so low enclosure has almost no effect while high enclosure ramps up steeply.
 
 The core multiplier is: `1 + enclosure.maxBonus * enclosure^exponent * depthFactor`.
 
-With defaults (`enclosure.maxBonus=15`, `enclosure.exponent=8`), depth alone doesn't increase hardness — it gates the enclosure effect. A fully enclosed block at max depth gets 16x hardness; the same block floating in the air stays at 1x.
+With defaults (`enclosure.maxBonus=15`, `enclosure.exponent=7`), depth alone doesn't increase hardness — it gates the enclosure effect. A fully enclosed block at max depth gets 16x hardness; the same block floating in the air stays at 1x.
 
 An optional `depth.maxBonus` (default 0) adds a separate depth-based multiplier on top: `(1 + depthFactor * depth.maxBonus)`.
 
@@ -43,7 +43,7 @@ Config file: `config/mininghardness-server.toml` (auto-generated on first run).
 | `depth.startY` | `62` | Y level where difficulty begins increasing |
 | `depth.endY` | `-64` | Y level where depth factor reaches maximum |
 | `depth.maxBonus` | `0.0` | Extra multiplier from depth alone (0 = depth only gates enclosure) |
-| `enclosure.exponent` | `8.0` | Steepness of enclosure scaling (higher = sharper curve) |
+| `enclosure.exponent` | `7.0` | Steepness of enclosure scaling (higher = sharper curve) |
 | `enclosure.maxBonus` | `15.0` | Max multiplier bonus when fully enclosed at max depth |
 | `nether.startY` | `128` | Nether start Y (set equal to endY for constant max depth) |
 | `nether.endY` | `128` | Nether end Y |
