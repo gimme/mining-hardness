@@ -6,7 +6,7 @@ Blocks near the surface or exposed to open air mine normally. Blocks deep underg
 
 The intent is to make mining a more strategic activity — the deeper you go, the more incentivized you are to explore caves instead of digging through solid rock.
 
-![Logo](/images/logo.png)
+![Logo](images/logo.png)
 
 > **Note:** The mod must be installed on both the client and server. Configure it on the server — those settings are synced to each client automatically, so client config files don't need to match.
 
@@ -26,25 +26,25 @@ Two factors determine the hardness multiplier:
 
 1. **Depth factor** (0–1): Linear interpolation between sea level and bedrock. In the Nether, max depth factor is always applied.
 
-2. **Enclosure** (0–1): How surrounded a block is by solid blocks in a 5x5x5 area. The raw value is raised to an exponent (default 5) so low enclosure has almost no effect while high enclosure ramps up steeply.
+2. **Enclosure** (0–1): How surrounded a block is by solid blocks in a 5x5x5 area. The raw value is raised to an exponent (default 8) so low enclosure has almost no effect while high enclosure ramps up steeply.
 
-The core multiplier is: `1 + enclosureBonus * enclosure^exponent * depthFactor`.
+The core multiplier is: `1 + enclosure.maxBonus * enclosure^exponent * depthFactor`.
 
-With defaults (`enclosureBonus=15`, `exponent=5`), depth alone doesn't increase hardness — it gates the enclosure effect. A fully enclosed block at max depth gets 16x hardness; the same block floating in the air stays at 1x.
+With defaults (`enclosure.maxBonus=15`, `enclosure.exponent=8`), depth alone doesn't increase hardness — it gates the enclosure effect. A fully enclosed block at max depth gets 16x hardness; the same block floating in the air stays at 1x.
 
-An optional `depthBonus` (default 0) adds a separate depth-based multiplier on top: `(1 + depthFactor * depthBonus)`.
+An optional `depth.maxBonus` (default 0) adds a separate depth-based multiplier on top: `(1 + depthFactor * depth.maxBonus)`.
 
 ## Configuration
 
-Config file: `config/mininghardness-common.toml` (auto-generated on first run).
+Config file: `config/mininghardness-server.toml` (auto-generated on first run).
 
 | Setting | Default | Description |
 |---|---|---|
 | `depth.startY` | `62` | Y level where difficulty begins increasing |
 | `depth.endY` | `-64` | Y level where depth factor reaches maximum |
-| `depth.multiplierBonus` | `0.0` | Extra multiplier from depth alone (0 = depth only gates enclosure) |
-| `enclosure.exponent` | `5.0` | Steepness of enclosure scaling (higher = sharper curve) |
-| `enclosure.multiplierBonus` | `15.0` | Max multiplier bonus when fully enclosed at max depth |
+| `depth.maxBonus` | `0.0` | Extra multiplier from depth alone (0 = depth only gates enclosure) |
+| `enclosure.exponent` | `8.0` | Steepness of enclosure scaling (higher = sharper curve) |
+| `enclosure.maxBonus` | `15.0` | Max multiplier bonus when fully enclosed at max depth |
 | `nether.startY` | `128` | Nether start Y (set equal to endY for constant max depth) |
 | `nether.endY` | `128` | Nether end Y |
 | `softCap.threshold` | `50` | Hardness above which the soft cap kicks in (obsidian = 50) |
