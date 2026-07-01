@@ -1,63 +1,49 @@
 # Mining Hardness
 
-Makes mining progressively harder based on **depth** and **enclosure** — the deeper and more buried a block is, the harder it is to mine.
-
-Blocks near the surface or exposed to open air mine normally. Blocks deep underground and surrounded by solid blocks can become up to 16x harder with default settings.
-
-The intent is to make mining a more strategic activity — the deeper you go, the more incentivized you are to explore caves instead of digging through solid rock.
+**The deeper and more buried a block is, the harder it is to mine.** Caves stay easy — tunneling through solid rock gets expensive.
 
 ![Logo](images/logo.png)
 
-> **Note:** The mod must be installed on both the client and server. Configure it on the server — those settings are synced to each client automatically, so client config files don't need to match.
+In vanilla, the optimal way to mine is also the most boring one: dig down to the right Y level and hold left-click. Mining Hardness changes that math. Every block's break time scales with two things: **how deep it is** and **how enclosed it is** by surrounding solid blocks. Blocks near the surface or exposed to open air mine exactly like vanilla. Blocks deep underground, sealed in rock on every side, become dramatically harder — slower to break, more food-draining, and rougher on your tools.
 
-## Features
+The result: caves become the smart way down. Natural tunnels and caverns are pre-carved paths through otherwise punishing rock, so exploring beats strip-mining — without banning anything.
 
-- **Mining speed**: Blocks take longer to break based on depth and enclosure
-- **Hunger**: Mining harder blocks causes more exhaustion
-- **Tool durability**: Tools take more damage on harder blocks
-- **Enclosure detection**: Scans a 5x5x5 area around each block, weighting closer blocks more heavily
-- **Dimension support**: Works in the Overworld and Nether (other dimensions unaffected)
-- **Soft cap**: Prevents blocks from becoming impossibly hard (caps excess hardness above a threshold)
-- **Block whitelist/blacklist**: Target or exclude specific blocks using regex patterns
+Some numbers with default settings (above Y 62, everything is vanilla):
+
+| Situation | Enclosure | At Y 0 | At Y −59 (diamond level) |
+|---|---|---|---|
+| Block exposed in an open cavern | low | ~1× | ~1× |
+| Mining into a flat wall | ~65% | ~1.4× | ~1.7× |
+| Tunneling a straight 1×1 hole | ~96% | ~6.5× | ~12× |
 
 ## How it works
 
-Two factors determine the hardness multiplier:
+Two factors combine into a hardness multiplier:
 
-1. **Depth factor** (0–1): Linear interpolation between sea level and bedrock. In the Nether, max depth factor is always applied.
+- **Depth** (0–1): scales linearly from sea level (Y 62) down to bedrock (Y −64). The Nether has no natural surface, so depth is maxed everywhere there by default.
+- **Enclosure** (0–1): how surrounded the block is by solid blocks, scanned in a 5×5×5 area with closer blocks weighted more heavily. The value is raised to an exponent (default 7), so open-ish spaces barely register while tightly sealed rock ramps up sharply.
 
-2. **Enclosure** (0–1): How surrounded a block is by solid blocks in a 5x5x5 area. The raw value is raised to an exponent (default 7) so low enclosure has almost no effect while high enclosure ramps up steeply.
+With default settings, the bonus hardness added on top of vanilla is:
 
-The core multiplier is: `1 + enclosure.maxBonus * enclosure^exponent * depthFactor`.
+```
+15 × enclosure^7 × depth
+```
 
-With defaults (`enclosure.maxBonus=15`, `enclosure.exponent=7`), depth alone doesn't increase hardness — it gates the enclosure effect. A fully enclosed block at max depth gets 16x hardness; the same block floating in the air stays at 1x.
+Depth alone adds nothing — it *gates* the enclosure effect. But an optional depth-only bonus can be enabled in the config.
 
-An optional `depth.maxBonus` (default 0) adds a separate depth-based multiplier on top: `(1 + depthFactor * depth.maxBonus)`.
+Harder blocks don't just break slower:
+
+- **Hunger** — mining boosted blocks costs proportionally more exhaustion.
+- **Tool durability** — tools take proportionally more damage on boosted blocks.
+
+A soft cap dampens hardness above obsidian's level (50), so already-hard block types never become absurdly slow. The mod affects the Overworld and the Nether; other dimensions are untouched.
 
 ## Configuration
 
-Config file: `config/mininghardness-server.toml` (auto-generated on first run).
+All settings live in `config/mininghardness-server.toml` on the server, generated on first run, and sync to clients automatically (the mod must be installed on both sides). Every option is documented in detail in the file itself, with concrete examples of what the defaults do. The highlights:
 
-| Setting | Default | Description |
-|---|---|---|
-| `depth.startY` | `62` | Y level where difficulty begins increasing |
-| `depth.endY` | `-64` | Y level where depth factor reaches maximum |
-| `depth.maxBonus` | `0.0` | Extra multiplier from depth alone (0 = depth only gates enclosure) |
-| `enclosure.exponent` | `7.0` | Steepness of enclosure scaling (higher = sharper curve) |
-| `enclosure.maxBonus` | `15.0` | Max multiplier bonus when fully enclosed at max depth |
-| `nether.startY` | `128` | Nether start Y (set equal to endY for constant max depth) |
-| `nether.endY` | `128` | Nether end Y |
-| `softCap.threshold` | `50` | Hardness above which the soft cap kicks in (obsidian = 50) |
-| `softCap.multiplier` | `0.2` | Reduction factor for hardness above the soft cap |
-| `effects.toolDamageMultiplier` | `1.0` | How much tool damage scales with hardness (0 = vanilla) |
-| `effects.exhaustionMultiplier` | `2.0` | How much exhaustion scales with hardness (0 = vanilla) |
-| `scope.blockWhitelist` | `""` | Regex of block IDs to affect (empty = all blocks) |
-| `scope.blockBlacklist` | `""` | Regex of block IDs to exclude (also excluded from enclosure scan) |
-| `scope.exemptMultiplier` | `0.0` | Effect factor for blocks excluded by white-/blacklist (0 = unaffected, 1 = fully affected) |
-
-### Whitelist/blacklist tips
-
-- Patterns match against the block's path (e.g. `stone`), unless the pattern contains `:`, in which case it matches the full ID (e.g. `minecraft:stone`).
-- Example whitelist: `stone|deepslate|andesite|calcite|diorite|granite|tuff` to only affect common cave blocks.
-- Example blacklist: `.*_ore` to exclude all ores.
-- Blacklisted blocks are not counted as solid in enclosure scans, so they don't make neighboring blocks harder.
+- `enclosure.maxBonus` / `enclosure.exponent` — overall strength of the effect and how sharply it ramps with enclosure.
+- `depth.startY` / `depth.endY` — the Y range over which depth scales, per dimension.
+- `depth.maxBonus` — extra hardness from depth alone, independent of enclosure (off by default).
+- `effects.*` — how strongly exhaustion and tool damage scale with hardness.
+- `scope.blockWhitelist` / `scope.blockBlacklist` — regexes to limit which blocks are affected. Example: blacklist `.*_ore` keeps all ores at vanilla hardness. Blacklisted blocks are also ignored by the enclosure scan, so they don't make their neighbors harder.
