@@ -60,11 +60,11 @@ public class FcapServerConfig implements ServerConfig {
                 This setting shapes how enclosure turns into extra hardness. Low values ramp the bonus up gradually as
                 enclosure increases; high values keep it at almost no effect until a block is very enclosed, then starts
                 spiking sharply, so open caverns stay easy while tight tunnels get much harder.
-                Default 5.0:
-                  - mining into a wall (~65% enclosed) gets you about 12% of the max bonus;
-                  - mining straight down (~96% enclosed) gets you about 81% of the max bonus.
+                Default 8.0:
+                  - mining into a wall (~65% enclosed) gets you ~3% of the max bonus;
+                  - mining straight down (~96% enclosed) gets you ~72% of the max bonus.
                 The actual formula (at max depth) is `multiplierBonus * enclosure^exponent = bonus hardness`.""")
-            .define("enclosure.exponent", 5.0, o -> o instanceof Number);
+            .define("enclosure.exponent", 8.0, o -> o instanceof Number);
 
     private static final ConfigValue<Number> ENCLOSURE_MULTIPLIER_BONUS = BUILDER
             .comment("""
